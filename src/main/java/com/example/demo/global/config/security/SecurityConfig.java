@@ -77,9 +77,5 @@ public class SecurityConfig {
         return new CustomUserDetailsService(userRepository);
     }
 
-    @Bean
-    public String dummyPasswordHash() {
-        return passwordEncoder().encode("dummy-password-for-timing-attack-prevention");
-    }
 }
 
