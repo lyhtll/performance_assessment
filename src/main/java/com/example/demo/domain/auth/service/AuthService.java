@@ -33,34 +33,32 @@ public class AuthService {
     private final RefreshTokenRepository tokenRepository;
     private final SecurityUtil securityUtil;
     private final BlacklistTokenRepository blacklistTokenRepository;
-    private final String dummyPasswordHash;
+    
+    private static final String DUMMY_PASSWORD_FOR_TIMING_ATTACK = "dummy-password-for-timing-attack-prevention";
 
     public AuthService(UserRepository userRepository,
                       PasswordEncoder passwordEncoder,
                       JwtProvider jwtProvider,
                       RefreshTokenRepository tokenRepository,
                       SecurityUtil securityUtil,
-                      BlacklistTokenRepository blacklistTokenRepository,
-                      String dummyPasswordHash) {
+                      BlacklistTokenRepository blacklistTokenRepository) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.jwtProvider = jwtProvider;
         this.tokenRepository = tokenRepository;
         this.securityUtil = securityUtil;
         this.blacklistTokenRepository = blacklistTokenRepository;
-        this.dummyPasswordHash = dummyPasswordHash;
     }
 
     @Transactional
     public void signup(SignUpRequest request) {
         validateUsernameNotExists(request.name());
 
-        User user = new User(
-                null,
-                request.name(),
-                passwordEncoder.encode(request.password()),
-                UserRole.USER
-        );
+        User user = User.builder()
+                .name(request.name())
+                .password(passwordEncoder.encode(request.password()))
+                .role(UserRole.USER)
+                .build();
         userRepository.save(user);
     }
 
@@ -69,7 +67,7 @@ public class AuthService {
         User user = userRepository.findByName(request.name());
 
         if (user == null) {
-            passwordEncoder.matches(request.password(), dummyPasswordHash);
+            passwordEncoder.matches(request.password(), passwordEncoder.encode(DUMMY_PASSWORD_FOR_TIMING_ATTACK));
             throw new CustomException(UserError.INVALID_CREDENTIALS);
         }
 
