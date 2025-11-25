@@ -17,13 +17,7 @@ spring:
       max-lifetime: 1800000
 
   jpa:
-    hibernate:
-      ddl-auto: create
     database-platform: org.hibernate.dialect.MySQLDialect
-    properties:
-      hibernate:
-        format_sql: true
-        show_sql: false
 
   data:
     redis:
