@@ -1,0 +1,56 @@
+spring:
+  profiles:
+    active: ${SPRING_PROFILE:local}
+  jackson:
+    serialization:
+      fail-on-empty-beans: false
+  datasource:
+    url: ${DB_URL}
+    username: ${DB_USER}
+    password: ${PASSWORD}
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    hikari:
+      maximum-pool-size: 10
+      minimum-idle: 5
+      connection-timeout: 30000
+      idle-timeout: 600000
+      max-lifetime: 1800000
+
+  jpa:
+    hibernate:
+      ddl-auto: create
+    database-platform: org.hibernate.dialect.MySQLDialect
+    properties:
+      hibernate:
+        format_sql: true
+        show_sql: false
+
+  data:
+    redis:
+      host: ${HOST}
+      port: ${PORT}
+      password: ${REDIS_PASSWORD}
+
+jwt:
+  secret-key: ${JWT_SECRET_KEY}
+  access-token-expiration: 3600000
+  refresh-token-expiration: 4380000000
+
+cookie:
+  access-token-max-age: ${COOKIE_ACCESS_TOKEN_MAX_AGE}
+  refresh-token-max-age: ${COOKIE_REFRESH_TOKEN_MAX_AGE}
+
+cors:
+  allowed-origins: ${CORS_ALLOWED_ORIGINS}
+
+security:
+  dummy-password-hash: ${DUMMY_PASSWORD_HASH:$2a$10$dummyHashForTimingAttackPreventionOnly}
+
+
+springdoc:
+  api-docs:
+    enabled: true
+    path: /v3/api-docs
+  swagger-ui:
+    path: /swagger-ui.html
+    enabled: true
