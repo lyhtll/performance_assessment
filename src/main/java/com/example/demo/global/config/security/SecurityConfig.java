@@ -1,4 +1,4 @@
-package com.example.demo.global.config.secutiry;
+package com.example.demo.global.config.security;
 
 import com.example.demo.global.security.jwt.filter.JwtAuthenticationFilter;
 import com.example.demo.global.security.jwt.filter.JwtExceptionFilter;
