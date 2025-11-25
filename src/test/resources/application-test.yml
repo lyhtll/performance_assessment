@@ -1,0 +1,31 @@
+spring:
+  datasource:
+    url: jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1
+    driver-class-name: org.h2.Driver
+    username: sa
+    password:
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    database-platform: org.hibernate.dialect.H2Dialect
+  data:
+    redis:
+      host: localhost
+      port: 6379
+
+jwt:
+  secret-key: testSecretKeyForTestingPurposesOnly123456789012345678901234567890
+  access-token-expiration: 3600000
+  refresh-token-expiration: 4380000000
+
+cookie:
+  access-token-max-age: 3600
+  refresh-token-max-age: 4380000
+
+security:
+  dummy-password-hash: $2a$10$dummyHashForTimingAttackPreventionOnly
+  app-secret: testAppSecret123
+
+cors:
+  allowed-origins: http://localhost:3000
+

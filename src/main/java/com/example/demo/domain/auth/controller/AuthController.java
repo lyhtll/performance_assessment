@@ -5,7 +5,10 @@ import com.example.demo.domain.auth.dto.request.LoginRequest;
 import com.example.demo.domain.auth.dto.request.ReissueRequest;
 import com.example.demo.domain.auth.dto.request.SignUpRequest;
 import com.example.demo.domain.auth.service.AuthService;
+import com.example.demo.domain.auth.error.AuthError;
 import com.example.demo.global.common.BaseResponse;
+import com.example.demo.global.config.properties.SecurityProperties;
+import com.example.demo.global.error.CustomException;
 import com.example.demo.global.security.jwt.response.TokenResponse;
 import com.example.demo.global.security.jwt.util.CookieUtil;
 import jakarta.servlet.http.HttpServletRequest;
@@ -15,6 +18,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -24,10 +28,12 @@ public class AuthController implements AuthDocs {
 
     private final AuthService authService;
     private final CookieUtil cookieUtil;
+    private final SecurityProperties securityProperties;
 
-    public AuthController(AuthService authService, CookieUtil cookieUtil) {
+    public AuthController(AuthService authService, CookieUtil cookieUtil, SecurityProperties securityProperties) {
         this.authService = authService;
         this.cookieUtil = cookieUtil;
+        this.securityProperties = securityProperties;
     }
 
     @PostMapping("/signup")
@@ -39,43 +45,78 @@ public class AuthController implements AuthDocs {
 
     @PostMapping("/login")
     @Override
-    public ResponseEntity<BaseResponse.Empty> login(
+    public ResponseEntity<?> login(
             @Valid @RequestBody LoginRequest loginRequest,
+            @RequestHeader(value = "X-App-Secret", required = false) String appSecretHeader,
+            HttpServletRequest request,
             HttpServletResponse response) {
+        validateClientAuthentication(request, appSecretHeader);
         TokenResponse tokenResponse = authService.login(loginRequest);
-
-        // HTTP-Only 쿠키에 토큰 저장
-        cookieUtil.addTokenCookies(response, tokenResponse.getAccessToken(), tokenResponse.getRefreshToken());
-
-        return BaseResponse.success(HttpStatus.OK.value(), "Success");
+        return handleTokenResponse(tokenResponse, appSecretHeader, response);
     }
 
     @PostMapping("/reissue")
     @Override
-    public ResponseEntity<BaseResponse.Empty> reissue(
+    public ResponseEntity<?> reissue(
+            @RequestHeader(value = "X-App-Secret", required = false) String appSecretHeader,
             HttpServletRequest request,
             HttpServletResponse response) {
-        // 쿠키에서 Refresh Token 추출
-        String refreshToken = cookieUtil.getRefreshTokenFromCookie(request);
-        if (refreshToken == null) {
-            throw new IllegalArgumentException("Refresh token not found in cookie");
-        }
-
+        validateClientAuthentication(request, appSecretHeader);
+        String refreshToken = extractRefreshToken(request);
         TokenResponse tokenResponse = authService.reissue(new ReissueRequest(refreshToken));
-
-        // 새로운 토큰을 쿠키에 저장
-        cookieUtil.addTokenCookies(response, tokenResponse.getAccessToken(), tokenResponse.getRefreshToken());
-
-        return BaseResponse.success(HttpStatus.OK.value(), "Success");
+        return handleTokenResponse(tokenResponse, appSecretHeader, response);
     }
 
     @PostMapping("/logout")
     @Override
     public ResponseEntity<BaseResponse.Empty> logout(HttpServletResponse response) {
         authService.logout();
-        // 쿠키에서 토큰 삭제
         cookieUtil.deleteTokenCookies(response);
         return BaseResponse.success(HttpStatus.OK.value(), "Success");
+    }
+
+    private void validateClientAuthentication(HttpServletRequest request, String appSecretHeader) {
+        if (appSecretHeader != null) {
+            // 앱: Secret 검증
+            if (!appSecretHeader.equals(securityProperties.getAppSecret())) {
+                throw new CustomException(AuthError.INVALID_APP_SECRET);
+            }
+        }
+    }
+
+    private ResponseEntity<?> handleTokenResponse(
+            TokenResponse tokenResponse,
+            String appSecretHeader,
+            HttpServletResponse response) {
+        if (appSecretHeader != null) {
+            // 앱: JSON으로 토큰 반환
+            return BaseResponse.of(tokenResponse, HttpStatus.OK.value(), "Success");
+        } else {
+            // 웹: HTTP-Only 쿠키에 토큰 저장
+            cookieUtil.addTokenCookies(response, tokenResponse.getAccessToken(), tokenResponse.getRefreshToken());
+            return BaseResponse.success(HttpStatus.OK.value(), "Success");
+        }
+    }
+
+    private String extractRefreshToken(HttpServletRequest request) {
+        String tokenFromCookie = cookieUtil.getRefreshTokenFromCookie(request);
+        String authHeader = request.getHeader("Authorization");
+        String tokenFromHeader = null;
+
+        if (authHeader != null && authHeader.startsWith("Bearer ")) {
+            String extracted = authHeader.substring("Bearer ".length());
+            if (!extracted.isBlank()) {
+                tokenFromHeader = extracted;
+            }
+        }
+
+        if (tokenFromCookie != null) {
+            return tokenFromCookie;
+        } else if (tokenFromHeader != null) {
+            return tokenFromHeader;
+        } else {
+            throw new CustomException(AuthError.REFRESH_TOKEN_NOT_FOUND);
+        }
     }
 }
 

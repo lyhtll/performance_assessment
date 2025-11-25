@@ -9,6 +9,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.RequestHeader;
 
 @Tag(name = "Auth", description = "인증 API")
 public interface AuthDocs {
@@ -18,20 +19,37 @@ public interface AuthDocs {
 
     @Operation(
             summary = "로그인",
-            description = "이메일과 비밀번호로 로그인합니다. 토큰은 HTTP-Only 쿠키로 전달됩니다."
+            description = """
+                웹/앱에 따라 다른 방식으로 토큰 반환:
+                - 웹(브라우저): Origin 헤더로 자동 인식, HTTP-Only 쿠키로 토큰 반환
+                - 앱(네이티브): X-App-Secret 헤더 필수, JSON으로 토큰 반환
+            """
     )
-    ResponseEntity<BaseResponse.Empty> login(LoginRequest loginRequest, HttpServletResponse response);
+    ResponseEntity<?> login(
+            LoginRequest loginRequest,
+            @RequestHeader(value = "X-App-Secret", required = false) String appSecretHeader,
+            HttpServletRequest request,
+            HttpServletResponse response
+    );
 
     @Operation(
             summary = "토큰 재발급",
-            description = "쿠키의 리프레시 토큰으로 새로운 액세스 토큰을 발급받습니다. 새 토큰은 HTTP-Only 쿠키로 전달됩니다.",
+            description = """
+                리프레시 토큰으로 새로운 액세스 토큰 발급:
+                - 웹: 쿠키에서 자동 추출
+                - 앱: Authorization 헤더 또는 쿠키에서 추출
+            """,
             security = @SecurityRequirement(name = "bearerAuth")
     )
-    ResponseEntity<BaseResponse.Empty> reissue(HttpServletRequest request, HttpServletResponse response);
+    ResponseEntity<?> reissue(
+            @RequestHeader(value = "X-App-Secret", required = false) String appSecretHeader,
+            HttpServletRequest request,
+            HttpServletResponse response
+    );
 
     @Operation(
             summary = "로그아웃",
-            description = "사용자를 로그아웃 처리하고 쿠키를 삭제합니다"
+            description = "로그아웃 처리 및 쿠키 삭제"
     )
     ResponseEntity<BaseResponse.Empty> logout(HttpServletResponse response);
 }

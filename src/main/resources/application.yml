@@ -45,6 +45,7 @@ cors:
 
 security:
   dummy-password-hash: ${DUMMY_PASSWORD_HASH:$2a$10$dummyHashForTimingAttackPreventionOnly}
+  app-secret: ${APP_SECRET:defaultSecretForDevelopment}
 
 
 springdoc:
