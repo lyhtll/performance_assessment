@@ -34,13 +34,5 @@ public class User extends BaseEntity {
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private UserRole role;
-
-    public void updatePassword(String newPassword) {
-        this.password = newPassword;
-    }
-
-    public void updateRole(UserRole newRole) {
-        this.role = newRole;
-    }
 }
 
