@@ -14,6 +14,7 @@ import com.example.demo.global.security.jwt.util.CookieUtil;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -24,17 +25,12 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/auth")
+@RequiredArgsConstructor
 public class AuthController implements AuthDocs {
 
     private final AuthService authService;
     private final CookieUtil cookieUtil;
     private final SecurityProperties securityProperties;
-
-    public AuthController(AuthService authService, CookieUtil cookieUtil, SecurityProperties securityProperties) {
-        this.authService = authService;
-        this.cookieUtil = cookieUtil;
-        this.securityProperties = securityProperties;
-    }
 
     @PostMapping("/signup")
     @Override
@@ -93,7 +89,7 @@ public class AuthController implements AuthDocs {
             return BaseResponse.of(tokenResponse, HttpStatus.OK.value(), "Success");
         } else {
             // 웹: HTTP-Only 쿠키에 토큰 저장
-            cookieUtil.addTokenCookies(response, tokenResponse.getAccessToken(), tokenResponse.getRefreshToken());
+            cookieUtil.addTokenCookies(response, tokenResponse.accessToken(), tokenResponse.refreshToken());
             return BaseResponse.success(HttpStatus.OK.value(), "Success");
         }
     }

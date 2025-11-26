@@ -54,7 +54,7 @@ public class WordController implements WordDocs {
             @PathVariable Long vocabularyId,
             @PathVariable Long wordId) {
         wordService.deleteWord(vocabularyId, wordId);
-        return BaseResponse.success(HttpStatus.OK.value(), "단어가 삭제되었습니다.");
+        return BaseResponse.success(HttpStatus.NO_CONTENT.value(), "단어가 삭제되었습니다.");
     }
 }
 
