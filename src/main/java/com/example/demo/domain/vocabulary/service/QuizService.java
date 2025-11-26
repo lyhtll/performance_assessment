@@ -18,15 +18,12 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
-public class QuizService {
+public class QuizService implements QuizServiceInterface {
 
     private final WordRepository wordRepository;
-    private final VocabularyService vocabularyService;
+    private final VocabularyServiceInterface vocabularyService;
 
-    /**
-     * 단어장에서 랜덤으로 섞인 단어 목록을 가져옵니다.
-     */
-    public List<QuizWordResponse> getRandomQuiz(Long vocabularyId) {
+    public List<QuizWordResponse> getQuizWords(Long vocabularyId) {
         vocabularyService.findVocabularyWithPermission(vocabularyId);
 
         List<Word> words = wordRepository.findByVocabularyId(vocabularyId);
@@ -43,9 +40,6 @@ public class QuizService {
                 .collect(Collectors.toList());
     }
 
-    /**
-     * 특정 단어에 대한 답변을 체크합니다.
-     */
     public CheckAnswerResponse checkAnswer(Long vocabularyId, Long wordId, CheckAnswerRequest request) {
         vocabularyService.findVocabularyWithPermission(vocabularyId);
 
@@ -61,4 +55,3 @@ public class QuizService {
         return new CheckAnswerResponse(correct, word.getDefinition());
     }
 }
-

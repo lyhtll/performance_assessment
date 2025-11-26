@@ -4,7 +4,7 @@ import com.example.demo.domain.vocabulary.docs.WordDocs;
 import com.example.demo.domain.vocabulary.dto.request.CreateWordRequest;
 import com.example.demo.domain.vocabulary.dto.request.UpdateWordRequest;
 import com.example.demo.domain.vocabulary.dto.response.WordResponse;
-import com.example.demo.domain.vocabulary.service.WordService;
+import com.example.demo.domain.vocabulary.service.WordServiceInterface;
 import com.example.demo.global.common.BaseResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -19,7 +19,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class WordController implements WordDocs {
 
-    private final WordService wordService;
+    private final WordServiceInterface wordService;
 
     @PostMapping
     @Override

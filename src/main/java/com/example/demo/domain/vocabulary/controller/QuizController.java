@@ -4,7 +4,7 @@ import com.example.demo.domain.vocabulary.docs.QuizDocs;
 import com.example.demo.domain.vocabulary.dto.request.CheckAnswerRequest;
 import com.example.demo.domain.vocabulary.dto.response.CheckAnswerResponse;
 import com.example.demo.domain.vocabulary.dto.response.QuizWordResponse;
-import com.example.demo.domain.vocabulary.service.QuizService;
+import com.example.demo.domain.vocabulary.service.QuizServiceInterface;
 import com.example.demo.global.common.BaseResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -19,13 +19,13 @@ import java.util.List;
 @RequiredArgsConstructor
 public class QuizController implements QuizDocs {
 
-    private final QuizService quizService;
+    private final QuizServiceInterface quizService;
 
     @GetMapping
     @Override
     public ResponseEntity<BaseResponse.Success<List<QuizWordResponse>>> getRandomQuiz(
             @PathVariable Long vocabularyId) {
-        List<QuizWordResponse> response = quizService.getRandomQuiz(vocabularyId);
+        List<QuizWordResponse> response = quizService.getQuizWords(vocabularyId);
         return BaseResponse.of(response, HttpStatus.OK.value(), "퀴즈를 시작합니다.");
     }
 
@@ -43,4 +43,3 @@ public class QuizController implements QuizDocs {
         );
     }
 }
-

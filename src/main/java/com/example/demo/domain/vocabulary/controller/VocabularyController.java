@@ -4,7 +4,7 @@ import com.example.demo.domain.vocabulary.docs.VocabularyDocs;
 import com.example.demo.domain.vocabulary.dto.request.CreateVocabularyRequest;
 import com.example.demo.domain.vocabulary.dto.request.UpdateVocabularyRequest;
 import com.example.demo.domain.vocabulary.dto.response.VocabularyResponse;
-import com.example.demo.domain.vocabulary.service.VocabularyService;
+import com.example.demo.domain.vocabulary.service.VocabularyServiceInterface;
 import com.example.demo.global.common.BaseResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -19,7 +19,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class VocabularyController implements VocabularyDocs {
 
-    private final VocabularyService vocabularyService;
+    private final VocabularyServiceInterface vocabularyService;
 
     @PostMapping
     @Override

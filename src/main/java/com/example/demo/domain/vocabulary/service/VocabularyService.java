@@ -19,7 +19,7 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
-public class VocabularyService {
+public class VocabularyService implements VocabularyServiceInterface {
 
     private final VocabularyRepository vocabularyRepository;
     private final SecurityUtil securityUtil;
@@ -80,4 +80,3 @@ public class VocabularyService {
         return vocabulary;
     }
 }
-

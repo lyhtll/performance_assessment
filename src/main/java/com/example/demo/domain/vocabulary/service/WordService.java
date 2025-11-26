@@ -17,10 +17,10 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
-public class WordService {
+public class WordService implements WordServiceInterface {
 
     private final WordRepository wordRepository;
-    private final VocabularyService vocabularyService;
+    private final VocabularyServiceInterface vocabularyService;
 
     @Transactional
     public WordResponse createWord(Long vocabularyId, CreateWordRequest request) {
