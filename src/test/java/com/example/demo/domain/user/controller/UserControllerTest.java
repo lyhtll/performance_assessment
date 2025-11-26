@@ -1,5 +1,6 @@
 package com.example.demo.domain.user.controller;
 
+import com.example.demo.domain.user.domain.UserRole;
 import com.example.demo.domain.user.dto.response.GetMeResponse;
 import com.example.demo.domain.user.service.UserServiceInterface;
 import org.junit.jupiter.api.BeforeEach;
@@ -38,7 +39,7 @@ class UserControllerTest {
     @DisplayName("현재 사용자 정보 조회 성공")
     void getMe_Success() throws Exception {
         // Given
-        GetMeResponse response = new GetMeResponse(1L, "testUser", "USER");
+        GetMeResponse response = new GetMeResponse(1L, "testUser", UserRole.USER);
         given(userService.getMe()).willReturn(response);
 
         // When & Then

@@ -45,7 +45,7 @@ class UserServiceTest {
         assertThat(result).isNotNull();
         assertThat(result.id()).isEqualTo(1L);
         assertThat(result.name()).isEqualTo("testUser");
-        assertThat(result.role()).isEqualTo("USER");
+        assertThat(result.role()).isEqualTo(UserRole.USER);
     }
 
     @Test
@@ -62,6 +62,6 @@ class UserServiceTest {
         assertThat(result).isNotNull();
         assertThat(result.id()).isEqualTo(2L);
         assertThat(result.name()).isEqualTo("adminUser");
-        assertThat(result.role()).isEqualTo("ADMIN");
+        assertThat(result.role()).isEqualTo(UserRole.ADMIN);
     }
 }

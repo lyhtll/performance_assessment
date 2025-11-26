@@ -48,6 +48,15 @@ class VocabularyServiceTest {
     void setUp() {
         testUser = new User(1L, "testUser", "password123", UserRole.USER);
         testVocabulary = new Vocabulary("테스트 단어장", "테스트 설명", testUser);
+        
+        // Vocabulary ID 설정
+        try {
+            var field = Vocabulary.class.getDeclaredField("id");
+            field.setAccessible(true);
+            field.set(testVocabulary, 1L);
+        } catch (Exception e) {
+            // Ignore for test
+        }
     }
 
     @Test
@@ -100,7 +109,7 @@ class VocabularyServiceTest {
         Long vocabularyId = 1L;
 
         given(securityUtil.getCurrentUser()).willReturn(testUser);
-        given(vocabularyRepository.findByIdAndUserId(vocabularyId, testUser.getId()))
+        given(vocabularyRepository.findById(vocabularyId))
                 .willReturn(Optional.of(testVocabulary));
 
         // when
@@ -109,7 +118,7 @@ class VocabularyServiceTest {
         // then
         assertThat(response).isNotNull();
         assertThat(response.title()).isEqualTo("테스트 단어장");
-        verify(vocabularyRepository, times(1)).findByIdAndUserId(vocabularyId, testUser.getId());
+        verify(vocabularyRepository, times(1)).findById(vocabularyId);
     }
 
     @Test
@@ -119,13 +128,14 @@ class VocabularyServiceTest {
         Long vocabularyId = 999L;
 
         given(securityUtil.getCurrentUser()).willReturn(testUser);
-        given(vocabularyRepository.findByIdAndUserId(vocabularyId, testUser.getId()))
+        given(vocabularyRepository.findById(vocabularyId))
                 .willReturn(Optional.empty());
 
         // when & then
         assertThatThrownBy(() -> vocabularyService.getVocabulary(vocabularyId))
                 .isInstanceOf(CustomException.class)
-                .hasFieldOrPropertyWithValue("error", VocabularyError.VOCABULARY_NOT_FOUND);
+                .extracting(e -> ((CustomException) e).getError())
+                .isEqualTo(VocabularyError.VOCABULARY_NOT_FOUND);
     }
 
     @Test
@@ -136,7 +146,7 @@ class VocabularyServiceTest {
         UpdateVocabularyRequest request = new UpdateVocabularyRequest("수정된 제목", "수정된 설명");
 
         given(securityUtil.getCurrentUser()).willReturn(testUser);
-        given(vocabularyRepository.findByIdAndUserId(vocabularyId, testUser.getId()))
+        given(vocabularyRepository.findById(vocabularyId))
                 .willReturn(Optional.of(testVocabulary));
 
         // when
@@ -145,7 +155,7 @@ class VocabularyServiceTest {
         // then
         assertThat(response.title()).isEqualTo("수정된 제목");
         assertThat(response.description()).isEqualTo("수정된 설명");
-        verify(vocabularyRepository, times(1)).findByIdAndUserId(vocabularyId, testUser.getId());
+        verify(vocabularyRepository, times(1)).findById(vocabularyId);
     }
 
     @Test
@@ -155,7 +165,7 @@ class VocabularyServiceTest {
         Long vocabularyId = 1L;
 
         given(securityUtil.getCurrentUser()).willReturn(testUser);
-        given(vocabularyRepository.findByIdAndUserId(vocabularyId, testUser.getId()))
+        given(vocabularyRepository.findById(vocabularyId))
                 .willReturn(Optional.of(testVocabulary));
 
         // when

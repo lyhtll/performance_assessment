@@ -161,8 +161,8 @@ class WordControllerTest {
         // when & then
         mockMvc.perform(delete("/vocabularies/{vocabularyId}/words/{wordId}", vocabularyId, wordId))
                 .andDo(print())
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.status").value(200))
+                .andExpect(status().isNoContent())
+                .andExpect(jsonPath("$.status").value(204))
                 .andExpect(jsonPath("$.message").value("단어가 삭제되었습니다."));
     }
 

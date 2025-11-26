@@ -98,7 +98,8 @@ class AuthServiceTest {
         // When & Then
         assertThatThrownBy(() -> authService.signup(request))
                 .isInstanceOf(CustomException.class)
-                .hasMessageContaining(UserError.USERNAME_DUPLICATION.getMessage());
+                .extracting(e -> ((CustomException) e).getError())
+                .isEqualTo(UserError.USERNAME_DUPLICATION);
 
         verify(userRepository).existsByName("existingUser");
         verify(userRepository, never()).save(any(User.class));
@@ -138,7 +139,8 @@ class AuthServiceTest {
         // When & Then
         assertThatThrownBy(() -> authService.login(request))
                 .isInstanceOf(CustomException.class)
-                .hasMessageContaining(UserError.INVALID_CREDENTIALS.getMessage());
+                .extracting(e -> ((CustomException) e).getError())
+                .isEqualTo(UserError.INVALID_CREDENTIALS);
 
         verify(userRepository).findByName("nonExistentUser");
         verify(passwordEncoder).matches("password123", "dummyEncoded");
@@ -156,7 +158,8 @@ class AuthServiceTest {
         // When & Then
         assertThatThrownBy(() -> authService.login(request))
                 .isInstanceOf(CustomException.class)
-                .hasMessageContaining(UserError.INVALID_CREDENTIALS.getMessage());
+                .extracting(e -> ((CustomException) e).getError())
+                .isEqualTo(UserError.INVALID_CREDENTIALS);
 
         verify(userRepository).findByName("testUser");
         verify(passwordEncoder).matches("wrongPassword", "encodedPassword");

@@ -166,8 +166,8 @@ class VocabularyControllerTest {
         // when & then
         mockMvc.perform(delete("/vocabularies/{vocabularyId}", vocabularyId))
                 .andDo(print())
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.status").value(200))
+                .andExpect(status().isNoContent())
+                .andExpect(jsonPath("$.status").value(204))
                 .andExpect(jsonPath("$.message").value("단어장이 삭제되었습니다."));
     }
 }

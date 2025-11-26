@@ -46,6 +46,15 @@ class QuizServiceTest {
     @BeforeEach
     void setUp() {
         testVocabulary = new Vocabulary("테스트 단어장", "설명", null);
+        // Vocabulary ID 설정
+        try {
+            var field = Vocabulary.class.getDeclaredField("id");
+            field.setAccessible(true);
+            field.set(testVocabulary, 1L);
+        } catch (Exception e) {
+            // Ignore for test
+        }
+        
         testWord1 = Word.builder()
                 .term("apple")
                 .definition("사과")
@@ -56,6 +65,16 @@ class QuizServiceTest {
                 .definition("바나나")
                 .vocabulary(testVocabulary)
                 .build();
+        
+        // Word IDs 설정
+        try {
+            var field = Word.class.getDeclaredField("id");
+            field.setAccessible(true);
+            field.set(testWord1, 1L);
+            field.set(testWord2, 2L);
+        } catch (Exception e) {
+            // Ignore for test
+        }
     }
 
     @Test
@@ -87,7 +106,8 @@ class QuizServiceTest {
         // When & Then
         assertThatThrownBy(() -> quizService.getQuizWords(vocabularyId))
                 .isInstanceOf(CustomException.class)
-                .hasMessageContaining(VocabularyError.EMPTY_VOCABULARY.getMessage());
+                .extracting(e -> ((CustomException) e).getError())
+                .isEqualTo(VocabularyError.EMPTY_VOCABULARY);
 
         verify(vocabularyService).findVocabularyWithPermission(vocabularyId);
         verify(wordRepository).findByVocabularyId(vocabularyId);
@@ -101,14 +121,6 @@ class QuizServiceTest {
         Long wordId = 1L;
         CheckAnswerRequest request = new CheckAnswerRequest("사과");
         
-        // Word의 ID를 설정 (리플렉션 사용)
-        try {
-            var field = Word.class.getDeclaredField("id");
-            field.setAccessible(true);
-            field.set(testWord1, 1L);
-        } catch (Exception e) {
-            // Ignore for test
-        }
         
         given(wordRepository.findById(wordId)).willReturn(Optional.of(testWord1));
 
@@ -130,14 +142,6 @@ class QuizServiceTest {
         Long wordId = 1L;
         CheckAnswerRequest request = new CheckAnswerRequest("바나나");
         
-        // Word의 ID를 설정
-        try {
-            var field = Word.class.getDeclaredField("id");
-            field.setAccessible(true);
-            field.set(testWord1, 1L);
-        } catch (Exception e) {
-            // Ignore for test
-        }
         
         given(wordRepository.findById(wordId)).willReturn(Optional.of(testWord1));
 
@@ -163,7 +167,8 @@ class QuizServiceTest {
         // When & Then
         assertThatThrownBy(() -> quizService.checkAnswer(vocabularyId, wordId, request))
                 .isInstanceOf(CustomException.class)
-                .hasMessageContaining(VocabularyError.WORD_NOT_FOUND.getMessage());
+                .extracting(e -> ((CustomException) e).getError())
+                .isEqualTo(VocabularyError.WORD_NOT_FOUND);
 
         verify(vocabularyService).findVocabularyWithPermission(vocabularyId);
         verify(wordRepository).findById(wordId);
