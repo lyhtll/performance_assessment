@@ -36,12 +36,12 @@ public class AuthService {
     private final String dummyPasswordHash;
 
     public AuthService(UserRepository userRepository,
-                      PasswordEncoder passwordEncoder,
-                      JwtProvider jwtProvider,
-                      RefreshTokenRepository tokenRepository,
-                      SecurityUtil securityUtil,
-                      BlacklistTokenRepository blacklistTokenRepository,
-                      String dummyPasswordHash) {
+            PasswordEncoder passwordEncoder,
+            JwtProvider jwtProvider,
+            RefreshTokenRepository tokenRepository,
+            SecurityUtil securityUtil,
+            BlacklistTokenRepository blacklistTokenRepository,
+            String dummyPasswordHash) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.jwtProvider = jwtProvider;
@@ -59,14 +59,14 @@ public class AuthService {
                 null,
                 request.name(),
                 passwordEncoder.encode(request.password()),
-                UserRole.USER
-        );
+                UserRole.USER);
         userRepository.save(user);
     }
 
     @Transactional
     public TokenResponse login(LoginRequest request) {
-        User user = userRepository.findByName(request.name());
+        User user = userRepository.findByName(request.name())
+                .orElse(null);
 
         if (user == null) {
             passwordEncoder.matches(request.password(), dummyPasswordHash);
@@ -105,8 +105,7 @@ public class AuthService {
 
         Date expiredAt = jwtProvider.extractExpiration(accessToken);
         blacklistTokenRepository.save(
-                new BlacklistToken(accessToken, expiredAt.getTime())
-        );
+                new BlacklistToken(accessToken, expiredAt.getTime()));
 
         if (tokenRepository.existsById(username)) {
             throw new CustomException(JwtError.TOKEN_DELETE_FAILED);
@@ -123,8 +122,7 @@ public class AuthService {
         // Timing Attack 방지
         if (!MessageDigest.isEqual(
                 savedToken.getRefreshToken().getBytes(),
-                refreshToken.getBytes()
-        )) {
+                refreshToken.getBytes())) {
             throw new CustomException(JwtError.INVALID_REFRESH_TOKEN);
         }
     }
@@ -135,4 +133,3 @@ public class AuthService {
         }
     }
 }
-

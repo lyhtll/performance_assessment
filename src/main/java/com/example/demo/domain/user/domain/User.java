@@ -2,12 +2,14 @@ package com.example.demo.domain.user.domain;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Entity
 @Table(name = "users")
 @Getter
+@Builder
 @AllArgsConstructor
 @NoArgsConstructor
 public class User {
@@ -25,4 +27,3 @@ public class User {
     @Enumerated(EnumType.STRING)
     private UserRole role;
 }
-
