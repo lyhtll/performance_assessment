@@ -1,7 +1,9 @@
 package com.example.demo.global.common;
 
+import lombok.Getter;
 import org.springframework.http.ResponseEntity;
 
+@Getter
 public abstract class BaseResponse {
     private final int status;
     private final String message;
@@ -9,14 +11,6 @@ public abstract class BaseResponse {
     protected BaseResponse(int status, String message) {
         this.status = status;
         this.message = message;
-    }
-
-    public int getStatus() {
-        return status;
-    }
-
-    public String getMessage() {
-        return message;
     }
 
     public static class Success<T> extends BaseResponse {
