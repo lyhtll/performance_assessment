@@ -1,5 +1,6 @@
 package com.example.demo.global.config.security;
 
+import com.example.demo.global.config.properties.SecurityProperties;
 import com.example.demo.global.security.jwt.filter.JwtAuthenticationFilter;
 import com.example.demo.global.security.jwt.filter.JwtExceptionFilter;
 import com.example.demo.global.security.jwt.handler.JwtAccessDeniedHandler;
@@ -28,6 +29,7 @@ public class SecurityConfig {
     private final JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
     private final JwtAccessDeniedHandler jwtAccessDeniedHandler;
     private final UserRepository userRepository;
+    private final SecurityProperties securityProperties;
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -60,6 +62,11 @@ public class SecurityConfig {
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
+    }
+
+    @Bean
+    public String dummyPasswordHash(){
+        return securityProperties.getDummyPasswordHash();
     }
 
     @Bean
