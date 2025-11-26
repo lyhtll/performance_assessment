@@ -10,21 +10,19 @@ import io.lettuce.core.api.StatefulRedisConnection;
 import io.lettuce.core.codec.ByteArrayCodec;
 import io.lettuce.core.codec.RedisCodec;
 import io.lettuce.core.codec.StringCodec;
+import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import java.time.Duration;
 
 @Configuration
+@RequiredArgsConstructor
 public class RateLimitConfig {
 
     private static final long REFILL_DURATION_SECONDS = 60L;
 
     private final RedisClient redisClient;
-
-    public RateLimitConfig(RedisClient redisClient) {
-        this.redisClient = redisClient;
-    }
 
     @Bean
     public ProxyManager<String> proxyManager() {

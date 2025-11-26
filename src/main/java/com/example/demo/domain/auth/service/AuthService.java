@@ -17,6 +17,7 @@ import com.example.demo.global.security.jwt.provider.JwtProvider;
 import com.example.demo.global.security.jwt.response.TokenResponse;
 import com.example.demo.global.security.jwt.type.TokenType;
 import com.example.demo.global.security.util.SecurityUtil;
+import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -25,6 +26,7 @@ import java.security.MessageDigest;
 import java.util.Date;
 
 @Service
+@RequiredArgsConstructor
 public class AuthService {
 
     private final UserRepository userRepository;
@@ -34,7 +36,6 @@ public class AuthService {
     private final SecurityUtil securityUtil;
     private final BlacklistTokenRepository blacklistTokenRepository;
     private final String dummyPasswordHash;
-
     public AuthService(UserRepository userRepository,
             PasswordEncoder passwordEncoder,
             JwtProvider jwtProvider,
@@ -69,7 +70,7 @@ public class AuthService {
                 .orElse(null);
 
         if (user == null) {
-            passwordEncoder.matches(request.password(), dummyPasswordHash);
+            passwordEncoder.matches(request.password(), passwordEncoder.encode(dummyPasswordHash));
             throw new CustomException(UserError.INVALID_CREDENTIALS);
         }
 

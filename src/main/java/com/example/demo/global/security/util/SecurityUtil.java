@@ -23,12 +23,11 @@ public class SecurityUtil {
         }
 
         Object principal = authentication.getPrincipal();
-        if (!(principal instanceof CustomUserDetails)) {
+        if (!(principal instanceof CustomUserDetails userDetails)) {
             throw new CustomException(UserError.USER_NOT_FOUND);
         }
 
-        CustomUserDetails userDetails = (CustomUserDetails) principal;
-        return userDetails.getUser();
+        return userDetails.user();
     }
 
     public String getCurrentAccessToken() {

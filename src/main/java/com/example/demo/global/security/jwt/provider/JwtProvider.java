@@ -19,7 +19,9 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.MalformedJwtException;
 import io.jsonwebtoken.UnsupportedJwtException;
 import io.jsonwebtoken.security.Keys;
+import jakarta.annotation.PostConstruct;
 import jakarta.servlet.http.HttpServletRequest;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -30,6 +32,7 @@ import java.time.LocalDateTime;
 import java.util.Date;
 
 @Component
+@RequiredArgsConstructor
 public class JwtProvider {
 
     private final JwtProperties jwtProperties;
@@ -41,19 +44,7 @@ public class JwtProvider {
     private SecretKey secretKey;
     private io.jsonwebtoken.JwtParser jwtParser;
 
-    public JwtProvider(JwtProperties jwtProperties,
-                      UserCacheRepository userCacheRepository,
-                      RefreshTokenRepository tokenRepository,
-                      UserRepository userRepository,
-                      BlacklistTokenRepository blacklistTokenRepository) {
-        this.jwtProperties = jwtProperties;
-        this.userCacheRepository = userCacheRepository;
-        this.tokenRepository = tokenRepository;
-        this.userRepository = userRepository;
-        this.blacklistTokenRepository = blacklistTokenRepository;
-        initializeKeys();
-    }
-
+    @PostConstruct
     private void initializeKeys() {
         this.secretKey = Keys.hmacShaKeyFor(jwtProperties.getSecretKey().getBytes());
         this.jwtParser = Jwts.parser()

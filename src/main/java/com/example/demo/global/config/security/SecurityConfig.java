@@ -1,11 +1,13 @@
-package com.example.demo.global.config.secutiry;
+package com.example.demo.global.config.security;
 
+import com.example.demo.global.config.properties.SecurityProperties;
 import com.example.demo.global.security.jwt.filter.JwtAuthenticationFilter;
 import com.example.demo.global.security.jwt.filter.JwtExceptionFilter;
 import com.example.demo.global.security.jwt.handler.JwtAccessDeniedHandler;
 import com.example.demo.global.security.jwt.handler.JwtAuthenticationEntryPoint;
 import com.example.demo.global.security.user.CustomUserDetailsService;
 import com.example.demo.domain.user.repository.UserRepository;
+import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -19,6 +21,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 
 @Configuration
 @EnableWebSecurity
+@RequiredArgsConstructor
 public class SecurityConfig {
 
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
@@ -26,18 +29,7 @@ public class SecurityConfig {
     private final JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
     private final JwtAccessDeniedHandler jwtAccessDeniedHandler;
     private final UserRepository userRepository;
-
-    public SecurityConfig(JwtAuthenticationFilter jwtAuthenticationFilter,
-                         JwtExceptionFilter jwtExceptionFilter,
-                         JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint,
-                         JwtAccessDeniedHandler jwtAccessDeniedHandler,
-                         UserRepository userRepository) {
-        this.jwtAuthenticationFilter = jwtAuthenticationFilter;
-        this.jwtExceptionFilter = jwtExceptionFilter;
-        this.jwtAuthenticationEntryPoint = jwtAuthenticationEntryPoint;
-        this.jwtAccessDeniedHandler = jwtAccessDeniedHandler;
-        this.userRepository = userRepository;
-    }
+    private final SecurityProperties securityProperties;
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -73,13 +65,14 @@ public class SecurityConfig {
     }
 
     @Bean
+    public String dummyPasswordHash(){
+        return securityProperties.getDummyPasswordHash();
+    }
+
+    @Bean
     public CustomUserDetailsService customUserDetailsService() {
         return new CustomUserDetailsService(userRepository);
     }
 
-    @Bean
-    public String dummyPasswordHash() {
-        return passwordEncoder().encode("dummy-password-for-timing-attack-prevention");
-    }
 }
 

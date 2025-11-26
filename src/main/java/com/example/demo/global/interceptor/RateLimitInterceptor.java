@@ -9,6 +9,7 @@ import io.github.bucket4j.ConsumptionProbe;
 import io.github.bucket4j.distributed.proxy.ProxyManager;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.HandlerInterceptor;
@@ -16,15 +17,11 @@ import org.springframework.web.servlet.HandlerInterceptor;
 import java.io.IOException;
 
 @Component
+@RequiredArgsConstructor
 public class RateLimitInterceptor implements HandlerInterceptor {
 
     private final ProxyManager<String> proxyManager;
     private final ObjectMapper objectMapper;
-
-    public RateLimitInterceptor(ProxyManager<String> proxyManager, ObjectMapper objectMapper) {
-        this.proxyManager = proxyManager;
-        this.objectMapper = objectMapper;
-    }
 
     @Override
     public boolean preHandle(HttpServletRequest request,

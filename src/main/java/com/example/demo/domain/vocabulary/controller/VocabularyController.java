@@ -58,7 +58,7 @@ public class VocabularyController implements VocabularyDocs {
     public ResponseEntity<BaseResponse.Empty> deleteVocabulary(
             @PathVariable Long vocabularyId) {
         vocabularyService.deleteVocabulary(vocabularyId);
-        return BaseResponse.success(HttpStatus.OK.value(), "단어장이 삭제되었습니다.");
+        return BaseResponse.success(HttpStatus.NO_CONTENT.value(), "단어장이 삭제되었습니다.");
     }
 }
 
