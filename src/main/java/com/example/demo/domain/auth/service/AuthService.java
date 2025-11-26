@@ -36,22 +36,38 @@ public class AuthService {
     private final SecurityUtil securityUtil;
     private final BlacklistTokenRepository blacklistTokenRepository;
     private final String dummyPasswordHash;
-
+    public AuthService(UserRepository userRepository,
+            PasswordEncoder passwordEncoder,
+            JwtProvider jwtProvider,
+            RefreshTokenRepository tokenRepository,
+            SecurityUtil securityUtil,
+            BlacklistTokenRepository blacklistTokenRepository,
+            String dummyPasswordHash) {
+        this.userRepository = userRepository;
+        this.passwordEncoder = passwordEncoder;
+        this.jwtProvider = jwtProvider;
+        this.tokenRepository = tokenRepository;
+        this.securityUtil = securityUtil;
+        this.blacklistTokenRepository = blacklistTokenRepository;
+        this.dummyPasswordHash = dummyPasswordHash;
+    }
 
     @Transactional
     public void signup(SignUpRequest request) {
         validateUsernameNotExists(request.name());
-        User user = User.builder()
-                .name(request.name())
-                .password(passwordEncoder.encode(request.password()))
-                .role(UserRole.USER)
-                .build();
+
+        User user = new User(
+                null,
+                request.name(),
+                passwordEncoder.encode(request.password()),
+                UserRole.USER);
         userRepository.save(user);
     }
 
     @Transactional
     public TokenResponse login(LoginRequest request) {
-        User user = userRepository.findByName(request.name());
+        User user = userRepository.findByName(request.name())
+                .orElse(null);
 
         if (user == null) {
             passwordEncoder.matches(request.password(), passwordEncoder.encode(dummyPasswordHash));
@@ -90,8 +106,7 @@ public class AuthService {
 
         Date expiredAt = jwtProvider.extractExpiration(accessToken);
         blacklistTokenRepository.save(
-                new BlacklistToken(accessToken, expiredAt.getTime())
-        );
+                new BlacklistToken(accessToken, expiredAt.getTime()));
 
         if (tokenRepository.existsById(username)) {
             throw new CustomException(JwtError.TOKEN_DELETE_FAILED);
@@ -108,8 +123,7 @@ public class AuthService {
         // Timing Attack 방지
         if (!MessageDigest.isEqual(
                 savedToken.getRefreshToken().getBytes(),
-                refreshToken.getBytes()
-        )) {
+                refreshToken.getBytes())) {
             throw new CustomException(JwtError.INVALID_REFRESH_TOKEN);
         }
     }
@@ -120,4 +134,3 @@ public class AuthService {
         }
     }
 }
-

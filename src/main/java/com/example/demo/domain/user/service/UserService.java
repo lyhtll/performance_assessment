@@ -15,4 +15,3 @@ public class UserService {
         return GetMeResponse.of(securityUtil.getCurrentUser());
     }
 }
-

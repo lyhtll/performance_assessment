@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/users")
+@RequiredArgsConstructor
 public class UserController implements UserDocs {
 
     private final UserService userService;
@@ -24,4 +25,3 @@ public class UserController implements UserDocs {
         return BaseResponse.of(userService.getMe(), HttpStatus.OK.value(), "Success");
     }
 }
-

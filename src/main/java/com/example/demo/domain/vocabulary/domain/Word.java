@@ -3,11 +3,15 @@ package com.example.demo.domain.vocabulary.domain;
 import com.example.demo.global.common.BaseEntity;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Entity
 @Getter
+@Builder
+@AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(name = "word")
 public class Word extends BaseEntity {
@@ -41,4 +45,3 @@ public class Word extends BaseEntity {
         return this.definition.trim().equalsIgnoreCase(answer.trim());
     }
 }
-
