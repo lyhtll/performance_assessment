@@ -3,7 +3,9 @@ package com.example.demo.domain.auth.controller;
 import com.example.demo.domain.auth.dto.request.LoginRequest;
 import com.example.demo.domain.auth.dto.request.SignUpRequest;
 import com.example.demo.domain.auth.service.AuthServiceInterface;
+import com.example.demo.global.config.properties.SecurityProperties;
 import com.example.demo.global.security.jwt.response.TokenResponse;
+import com.example.demo.global.security.jwt.util.CookieUtil;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -32,6 +34,12 @@ class AuthControllerTest {
 
     @Mock
     private AuthServiceInterface authService;
+    
+    @Mock
+    private CookieUtil cookieUtil;
+    
+    @Mock
+    private SecurityProperties securityProperties;
 
     @InjectMocks
     private AuthController authController;
@@ -55,7 +63,7 @@ class AuthControllerTest {
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.status").value(201))
-                .andExpect(jsonPath("$.message").value("회원가입이 완료되었습니다."))
+                .andExpect(jsonPath("$.message").value("Success"))
                 .andDo(print());
     }
 
@@ -87,8 +95,7 @@ class AuthControllerTest {
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.status").value(200))
-                .andExpect(jsonPath("$.message").value("로그인이 완료되었습니다."))
-                .andExpect(jsonPath("$.data.accessToken").value("accessToken"))
+                .andExpect(jsonPath("$.message").value("Success"))
                 .andDo(print());
     }
 
@@ -116,7 +123,7 @@ class AuthControllerTest {
         mockMvc.perform(post("/auth/logout"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.status").value(200))
-                .andExpect(jsonPath("$.message").value("로그아웃이 완료되었습니다."))
+                .andExpect(jsonPath("$.message").value("Success"))
                 .andDo(print());
     }
 }
