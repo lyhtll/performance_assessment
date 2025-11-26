@@ -2,7 +2,6 @@ package com.example.demo.domain.vocabulary.service;
 
 import com.example.demo.domain.user.domain.User;
 import com.example.demo.domain.vocabulary.domain.Vocabulary;
-import com.example.demo.domain.vocabulary.domain.Word;
 import com.example.demo.domain.vocabulary.dto.request.CreateVocabularyRequest;
 import com.example.demo.domain.vocabulary.dto.request.UpdateVocabularyRequest;
 import com.example.demo.domain.vocabulary.dto.response.VocabularyResponse;
@@ -71,8 +70,14 @@ public class VocabularyService {
     public Vocabulary findVocabularyWithPermission(Long vocabularyId) {
         User currentUser = securityUtil.getCurrentUser();
 
-        return vocabularyRepository.findByIdAndUserId(vocabularyId, currentUser.getId())
+        Vocabulary vocabulary = vocabularyRepository.findById(vocabularyId)
                 .orElseThrow(() -> new CustomException(VocabularyError.VOCABULARY_NOT_FOUND));
+
+        if (!vocabulary.getUser().getId().equals(currentUser.getId())) {
+            throw new CustomException(VocabularyError.VOCABULARY_ACCESS_DENIED);
+        }
+
+        return vocabulary;
     }
 }
 

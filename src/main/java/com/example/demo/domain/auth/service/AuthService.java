@@ -17,6 +17,7 @@ import com.example.demo.global.security.jwt.provider.JwtProvider;
 import com.example.demo.global.security.jwt.response.TokenResponse;
 import com.example.demo.global.security.jwt.type.TokenType;
 import com.example.demo.global.security.util.SecurityUtil;
+import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -25,6 +26,7 @@ import java.security.MessageDigest;
 import java.util.Date;
 
 @Service
+@RequiredArgsConstructor
 public class AuthService {
 
     private final UserRepository userRepository;
@@ -33,27 +35,12 @@ public class AuthService {
     private final RefreshTokenRepository tokenRepository;
     private final SecurityUtil securityUtil;
     private final BlacklistTokenRepository blacklistTokenRepository;
-    
-    private static final String DUMMY_PASSWORD_FOR_TIMING_ATTACK = "dummy-password-for-timing-attack-prevention";
+    private final String dummyPasswordHash;
 
-    public AuthService(UserRepository userRepository,
-                      PasswordEncoder passwordEncoder,
-                      JwtProvider jwtProvider,
-                      RefreshTokenRepository tokenRepository,
-                      SecurityUtil securityUtil,
-                      BlacklistTokenRepository blacklistTokenRepository) {
-        this.userRepository = userRepository;
-        this.passwordEncoder = passwordEncoder;
-        this.jwtProvider = jwtProvider;
-        this.tokenRepository = tokenRepository;
-        this.securityUtil = securityUtil;
-        this.blacklistTokenRepository = blacklistTokenRepository;
-    }
 
     @Transactional
     public void signup(SignUpRequest request) {
         validateUsernameNotExists(request.name());
-
         User user = User.builder()
                 .name(request.name())
                 .password(passwordEncoder.encode(request.password()))
@@ -67,7 +54,7 @@ public class AuthService {
         User user = userRepository.findByName(request.name());
 
         if (user == null) {
-            passwordEncoder.matches(request.password(), passwordEncoder.encode(DUMMY_PASSWORD_FOR_TIMING_ATTACK));
+            passwordEncoder.matches(request.password(), passwordEncoder.encode(dummyPasswordHash));
             throw new CustomException(UserError.INVALID_CREDENTIALS);
         }
 
