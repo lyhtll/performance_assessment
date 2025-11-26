@@ -13,7 +13,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -27,11 +26,11 @@ public class WordService {
     public WordResponse createWord(Long vocabularyId, CreateWordRequest request) {
         Vocabulary vocabulary = vocabularyService.findVocabularyWithPermission(vocabularyId);
 
-        Word word = new Word(
-                request.term(),
-                request.definition(),
-                vocabulary
-        );
+        Word word = Word.builder()
+                .term(request.term())
+                .definition(request.definition())
+                .vocabulary(vocabulary)
+                .build();
 
         Word saved = wordRepository.save(word);
         vocabulary.addWord(saved);
@@ -45,7 +44,7 @@ public class WordService {
         return wordRepository.findByVocabularyId(vocabularyId)
                 .stream()
                 .map(WordResponse::from)
-                .collect(Collectors.toList());
+                .toList();
     }
 
     @Transactional
@@ -76,4 +75,3 @@ public class WordService {
         return word;
     }
 }
-
