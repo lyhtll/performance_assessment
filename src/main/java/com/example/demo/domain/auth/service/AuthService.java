@@ -3,8 +3,18 @@ package com.example.demo.domain.auth.service;
 import com.example.demo.domain.auth.dto.request.LoginRequest;
 import com.example.demo.domain.auth.dto.request.ReissueRequest;
 import com.example.demo.domain.auth.dto.request.SignUpRequest;
+import com.example.demo.domain.auth.domain.BlacklistToken;
+import com.example.demo.domain.auth.domain.RefreshToken;
+import com.example.demo.domain.auth.repository.BlacklistTokenRepository;
+import com.example.demo.domain.auth.repository.RefreshTokenRepository;
+import com.example.demo.domain.user.domain.User;
+import com.example.demo.domain.user.domain.UserRole;
+import com.example.demo.domain.user.error.UserError;
+import com.example.demo.domain.user.repository.UserRepository;
+import com.example.demo.global.error.CustomException;
+import com.example.demo.global.security.jwt.error.JwtError;
+import com.example.demo.global.security.jwt.provider.JwtProvider;
 import com.example.demo.global.security.jwt.response.TokenResponse;
-
 import com.example.demo.global.security.jwt.type.TokenType;
 import com.example.demo.global.security.util.SecurityUtil;
 import lombok.RequiredArgsConstructor;
@@ -17,7 +27,7 @@ import java.util.Date;
 
 @Service
 @RequiredArgsConstructor
-public class AuthService {
+public class AuthService implements AuthServiceInterface {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
@@ -26,21 +36,6 @@ public class AuthService {
     private final SecurityUtil securityUtil;
     private final BlacklistTokenRepository blacklistTokenRepository;
     private final String dummyPasswordHash;
-    public AuthService(UserRepository userRepository,
-            PasswordEncoder passwordEncoder,
-            JwtProvider jwtProvider,
-            RefreshTokenRepository tokenRepository,
-            SecurityUtil securityUtil,
-            BlacklistTokenRepository blacklistTokenRepository,
-            String dummyPasswordHash) {
-        this.userRepository = userRepository;
-        this.passwordEncoder = passwordEncoder;
-        this.jwtProvider = jwtProvider;
-        this.tokenRepository = tokenRepository;
-        this.securityUtil = securityUtil;
-        this.blacklistTokenRepository = blacklistTokenRepository;
-        this.dummyPasswordHash = dummyPasswordHash;
-    }
 
     @Transactional
     public void signup(SignUpRequest request) {

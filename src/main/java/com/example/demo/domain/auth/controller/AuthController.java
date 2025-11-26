@@ -4,7 +4,7 @@ import com.example.demo.domain.auth.docs.AuthDocs;
 import com.example.demo.domain.auth.dto.request.LoginRequest;
 import com.example.demo.domain.auth.dto.request.ReissueRequest;
 import com.example.demo.domain.auth.dto.request.SignUpRequest;
-import com.example.demo.domain.auth.service.AuthService;
+import com.example.demo.domain.auth.service.AuthServiceInterface;
 import com.example.demo.domain.auth.error.AuthError;
 import com.example.demo.global.common.BaseResponse;
 import com.example.demo.global.config.properties.SecurityProperties;
@@ -28,7 +28,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 public class AuthController implements AuthDocs {
 
-    private final AuthService authService;
+    private final AuthServiceInterface authService;
     private final CookieUtil cookieUtil;
     private final SecurityProperties securityProperties;
 

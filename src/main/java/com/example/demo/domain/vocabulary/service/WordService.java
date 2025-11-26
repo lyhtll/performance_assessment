@@ -1,19 +1,26 @@
 package com.example.demo.domain.vocabulary.service;
 
+import com.example.demo.domain.vocabulary.domain.Vocabulary;
 import com.example.demo.domain.vocabulary.domain.Word;
 import com.example.demo.domain.vocabulary.dto.request.CreateWordRequest;
 import com.example.demo.domain.vocabulary.dto.request.UpdateWordRequest;
 import com.example.demo.domain.vocabulary.dto.response.WordResponse;
+import com.example.demo.domain.vocabulary.error.VocabularyError;
+import com.example.demo.domain.vocabulary.repository.WordRepository;
+import com.example.demo.global.error.CustomException;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
-public class WordService {
+public class WordService implements WordServiceInterface {
 
     private final WordRepository wordRepository;
-    private final VocabularyService vocabularyService;
+    private final VocabularyServiceInterface vocabularyService;
 
     @Transactional
     public WordResponse createWord(Long vocabularyId, CreateWordRequest request) {
